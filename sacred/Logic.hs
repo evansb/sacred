@@ -43,7 +43,7 @@ diff p (SNode h1 _ c1) (SNode h2 _ c2)
 diff p (SLeaf txt1 _) (SNode _ _ c)
     = Remove p (hash txt1) S.<| addDiffList p c
 
-fitScore :: (SourcePos, SourcePos) -> STree -> SourcePos
+fitScore :: SourceRange -> STree -> SourcePos
 fitScore _ SEmpty = (maxBound::Int, maxBound::Int)
 fitScore int1@((rb, cb), (re, ce)) (SNode _ int2@((rb', cb'), (re', ce')) _) =
         if not (int2 `containedIn` int1)
@@ -55,7 +55,7 @@ fitScore int1@((rb, cb), (re, ce)) (SNode _ int2@((rb', cb'), (re', ce')) _) =
                 | rb == rb' && rb' <= re' && re' == re =
                     cb <= cb' && cb' <= ce' && ce' <= ce
 
-bestFit :: (SourcePos, SourcePos) -> STree -> Maybe Hash
+bestFit :: SourceRange -> STree -> Maybe Hash
 bestFit pos tree = case fitScores pos tree of
                        [] -> Nothing
                        f -> Just (snd (Prelude.minimum f))

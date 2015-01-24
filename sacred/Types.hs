@@ -9,18 +9,19 @@ type Hash = Int
 type ID = String
 
 type SourcePos = (Int, Int)
+type SourceRange = SourceRange
 type Code = Text
 
 data STree = SEmpty
            | SLeaf Code SourcePos
-           | SNode Hash (SourcePos, SourcePos) [STree]
+           | SNode Hash SourceRange [STree]
            deriving (Show, Eq, Generic)
 
 instance ToJSON STree
 instance FromJSON STree
 
 data CommentReq = CommentReq {
-    _range   :: (SourcePos, SourcePos),
+    _range   :: SourceRange,
     _content :: Text
 } deriving (Show, Eq, Generic)
 
@@ -45,7 +46,8 @@ instance FromJSON ReviewReq
 
 data AnalysisReq = AnalysisReq {
     _aroldcode :: Code,
-    _arnewcode :: Code
+    _arnewcode :: Code,
+    _arcomment :: [CommentRes]
 } deriving (Show, Eq, Generic)
 
 instance ToJSON AnalysisReq
