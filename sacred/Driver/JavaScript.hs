@@ -14,6 +14,10 @@ toPos (TokenPn _ ln col) = (ln, col)
 singletonNode :: String -> Maybe SourcePos -> STree
 singletonNode s p = SNode (hash s) [SLeaf (pack s) p]
 
+listNode :: [JSNode] -> STree
+listNode s = let children = map toTree s in
+    SNode (combineHashes children) children
+
 combineHashes :: [STree] -> Hash
 combineHashes [] = error "No."
 combineHashes (SNode h _ : xs) =
@@ -35,5 +39,5 @@ toTree n = case n of
             JSOctal s -> singletonNode s p
             JSStringLiteral _ s -> singletonNode s p
             JSRegEx s -> singletonNode s p
-            JSArguments _ s _ -> let children = map toTree s in
-                    SNode (combineHashes children) children
+            JSArguments _ s _ -> listNode s
+            JSArrayLiteral _ s _ -> listNode s

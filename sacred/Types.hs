@@ -11,7 +11,7 @@ type ID = String
 
 type SourcePos = (Int, Int)
 
-data STree = SLeaf { _leafContent :: Text, _sourcePos :: (Maybe SourcePos) }
+data STree = SLeaf { _leafContent :: Text, _sourcePos :: Maybe SourcePos }
            | SNode { _hash :: Hash, _children :: [STree] }
            deriving (Show, Eq, Generic)
 
