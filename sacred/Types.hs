@@ -10,15 +10,14 @@ type Hash = Int
 type ID = String
 
 type SourcePos = (Int, Int)
+type Code = Text
 
-data STree = SLeaf { _leafContent :: Text, _sourcePos :: SourcePos }
+data STree = SLeaf { _leafContent :: Code, _sourcePos :: SourcePos }
            | SNode { _hash :: Hash, _children :: [STree] }
            deriving (Show, Eq, Generic)
 
 instance ToJSON STree
 instance FromJSON STree
-
-type Code = Text
 
 data CommentReq = CommentReq {
     _range   :: (SourcePos, SourcePos),
@@ -44,13 +43,11 @@ data AnalysisReq = AnalysisReq {
 instance ToJSON AnalysisReq
 instance FromJSON AnalysisReq
 
-data DiffElt = DiffElt {
-    _deoldcode :: Code,
-    _denewcode :: Code
-} deriving (Show, Eq, Generic)
+data DiffType = Add Code | Change Code Code | Remove Code | NoChange
+    deriving (Show, Eq, Generic)
 
-instance ToJSON DiffElt
-instance FromJSON DiffElt
+instance ToJSON DiffType
+instance FromJSON DiffType
 
 class LangDriver a where
     parseSource :: Code -> a
