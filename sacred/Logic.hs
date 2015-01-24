@@ -2,11 +2,14 @@
 module Logic where
 
 import qualified Data.Sequence as S
+import qualified Driver.JavaScript as JS
+
 import Prelude hiding (foldl1)
+import Data.Maybe
 import Data.Hashable
 import Data.Foldable
+
 import Types
-import qualified Driver.JavaScript as JS
 
 hashOf :: STree -> Hash
 hashOf (SLeaf txt _) = hash txt
@@ -37,15 +40,42 @@ diff p (SNode h1 _ c1) (SNode h2 _ c2)
                     let zipped = foldl1 (S.><) (zipWith (diff p) c1 c2') in
                     zipped S.>< addDiffList p c2r
                 | otherwise = diffList c2 c1 -- Symmetry
-
 diff p (SLeaf txt1 _) (SNode _ _ c)
     = Remove p (hash txt1) S.<| addDiffList p c
 
+fitScore :: (SourcePos, SourcePos) -> STree -> SourcePos
+fitScore _ SEmpty = (maxBound::Int, maxBound::Int)
+fitScore int1@((rb, cb), (re, ce)) (SNode _ int2@((rb', cb'), (re', ce')) _) =
+        if not (int2 `containedIn` int1)
+        then (maxBound::Int, maxBound::Int)
+        else (re - re' + rb' - rb, ce - ce' + cb' - cb)
+        where
+            ((rb', cb'), (re', ce')) `containedIn` ((rb, cb), (re, ce))
+                | rb < rb' && rb' < re' && re' < re = True
+                | rb == rb' && rb' <= re' && re' == re =
+                    cb <= cb' && cb' <= ce' && ce' <= ce
+
+bestFit :: (SourcePos, SourcePos) -> STree -> Maybe Hash
+bestFit pos tree = case fitScores pos tree of
+                       [] -> Nothing
+                       f -> Just (snd (Prelude.minimum f))
+    where
+        fitScores pos SEmpty      = [(fitScore pos SEmpty, 0)]
+        fitScores _ (SLeaf _ _) = []
+        fitScores pos t@(SNode h _ c) =
+            (fitScore pos t, h) : Prelude.concatMap (fitScores pos) c
+
+
 diffJS :: Code -> Code -> [DiffType]
 diffJS old new = case (oldTree, newTree) of
-            (SEmpty, SEmpty) -> []
-            (SEmpty, SNode h _ _) -> [Add 0 h]
-            (SNode h _ _, _) -> toList $ diff h oldTree newTree
-            where oldTree = toGenTree (parseSource old :: JS.NodeType)
-                  newTree = toGenTree (parseSource new :: JS.NodeType)
+        (SEmpty, SEmpty) -> []
+        (SEmpty, SNode h _ _) -> [Add 0 h]
+        (SNode h _ _, _) -> toList $ diff h oldTree newTree
+        where oldTree = toGenTree (parseSource old :: JS.Type)
+              newTree = toGenTree (parseSource new :: JS.Type)
 
+commentJS :: CommentReq -> Code -> CommentRes
+commentJS creq cde = CommentRes (fromMaybe 0 (bestFit range tree)) (_content creq)
+        where
+            range = _range creq
+            tree = toGenTree (parseSource cde :: JS.Type)

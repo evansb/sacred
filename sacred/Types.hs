@@ -27,6 +27,14 @@ data CommentReq = CommentReq {
 instance ToJSON CommentReq
 instance FromJSON CommentReq
 
+data CommentRes = CommentRes {
+    _chash :: Hash,
+    _creqcontent :: Text
+} deriving (Show, Eq, Generic)
+
+instance ToJSON CommentRes
+instance FromJSON CommentRes
+
 data ReviewReq = ReviewReq {
     _rrcode :: Code,
     _rrcomments :: [CommentReq]

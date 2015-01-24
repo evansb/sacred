@@ -10,10 +10,10 @@ import  System.IO.Unsafe
 import  Types
 
 instance LangDriver JSNode where
-        parseSource = readJs . unpack
+        parseSource =  readJs . unpack
         toGenTree = toTree . removeEof
 
-type NodeType = JSNode
+type Type = JSNode
 
 (+>) :: SourcePos -> Int -> SourcePos
 (x, y) +> d = (x, y + d)
@@ -87,7 +87,7 @@ toTree n = case n of
                 withChildren [toTree c, toMultiTree l, toTree s]
             JSDefault d l s ->
                 withChildren (map toTree s)
-            JSDoWhile p e q r f s t -> 
+            JSDoWhile p e q r f s t ->
                 withChildren (map toTree [p,e,q,r,f,s,t])
             JSElision _ -> SEmpty
             JSExpression s -> withChildren (map toTree s)
@@ -101,7 +101,7 @@ toTree n = case n of
             JSFinally f b ->
                 withChildren [toTree f, toTree b]
             JSFor a b e c f d g z h ->
-                withChildren [toTree a, toTree b, toMultiTree e, 
+                withChildren [toTree a, toTree b, toMultiTree e,
                               toTree c, toMultiTree f, toTree d, toMultiTree g,
                               toTree z, toTree h
                               ]
@@ -116,10 +116,10 @@ toTree n = case n of
             JSForVarIn a b v e l f r g ->
                 withChildren $ map toTree [a, b, v, e, l, f, r, g]
             JSFunction s e l f r g ->
-                withChildren [toTree s, toTree e, toTree l, toMultiTree f, 
+                withChildren [toTree s, toTree e, toTree l, toMultiTree f,
                               toTree r, toTree g]
             JSFunctionExpression s e l f r g ->
-                withChildren [toTree s, toMultiTree e, toTree l, toMultiTree f, 
+                withChildren [toTree s, toMultiTree e, toTree l, toMultiTree f,
                               toTree r, toTree g]
             JSIf i l e r f g ->
                 withChildren [toTree e, toMultiTree f, toMultiTree g]
