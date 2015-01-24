@@ -10,8 +10,9 @@ import  Data.IntervalMap.FingerTree     (point)
 import  System.IO.Unsafe
 import  Types
 
-sourceToTree :: Code -> STree
-sourceToTree = toTree . readJs . unpack
+instance LangDriver JSNode where
+        parseSource = readJs . unpack
+        toGenTree = toTree
 
 toPos :: TokenPosn -> SourcePos
 toPos (TokenPn _ ln col) = (ln, col)

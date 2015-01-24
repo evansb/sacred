@@ -20,8 +20,38 @@ instance FromJSON STree
 
 type Code = Text
 
-data Comment = Comment { _id :: ID, _parent :: ID, _attached :: [Hash] }
-             deriving (Show, Eq, Generic)
+data CommentReq = CommentReq {
+    _range   :: (SourcePos, SourcePos),
+    _content :: Text
+} deriving (Show, Eq, Generic)
 
-instance ToJSON Comment
-instance FromJSON Comment
+instance ToJSON CommentReq
+instance FromJSON CommentReq
+
+data ReviewReq = ReviewReq {
+    _rrcode :: Code,
+    _rrcomments :: [CommentReq]
+} deriving (Show, Eq, Generic)
+
+instance ToJSON ReviewReq
+instance FromJSON ReviewReq
+
+data AnalysisReq = AnalysisReq {
+    _aroldcode :: Code,
+    _arnewcode :: Code
+} deriving (Show, Eq, Generic)
+
+instance ToJSON AnalysisReq
+instance FromJSON AnalysisReq
+
+data DiffElt = DiffElt {
+    _deoldcode :: Code,
+    _denewcode :: Code
+} deriving (Show, Eq, Generic)
+
+instance ToJSON DiffElt
+instance FromJSON DiffElt
+
+class LangDriver a where
+    parseSource :: Code -> a
+    toGenTree :: a -> STree
