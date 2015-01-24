@@ -12,8 +12,9 @@ type ID = String
 type SourcePos = (Int, Int)
 type Code = Text
 
-data STree = SLeaf { _leafContent :: Code, _sourcePos :: SourcePos }
-           | SNode { _hash :: Hash, _children :: [STree] }
+data STree = SEmpty
+           | SLeaf Code SourcePos
+           | SNode Hash (SourcePos, SourcePos) [STree]
            deriving (Show, Eq, Generic)
 
 instance ToJSON STree
@@ -43,8 +44,10 @@ data AnalysisReq = AnalysisReq {
 instance ToJSON AnalysisReq
 instance FromJSON AnalysisReq
 
-data DiffType = Add Code | Change Code Code | Remove Code | NoChange
-    deriving (Show, Eq, Generic)
+data DiffType = Add Hash Hash
+              | Change Hash Hash Hash
+              | Remove Hash Hash
+              deriving (Show, Eq, Generic)
 
 instance ToJSON DiffType
 instance FromJSON DiffType
