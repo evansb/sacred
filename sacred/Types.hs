@@ -6,7 +6,7 @@ import  Data.IntervalMap.FingerTree     (Interval)
 import  Data.Text                       (Text)
 import  GHC.Generics                    (Generic)
 
-type Hash = Integer
+type Hash = Int
 type ID = String
 
 type SourcePos = (Int, Int)

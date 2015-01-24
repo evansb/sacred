@@ -3,6 +3,7 @@
 module Driver.JavaScript where
 
 import  Language.JavaScript.Parser
+import  Data.Hashable                   (hash)
 import  Data.Text                       (pack)
 import  Data.IntervalMap.FingerTree     (point)
 import  Types
@@ -10,9 +11,8 @@ import  Types
 toPos :: TokenPosn -> SourcePos
 toPos (TokenPn _ ln col) = (ln, col)
 
-singletonNode :: STree -> STree
-singletonNode (SLeaf s p) = undefined
-singletonNode other = other
+singletonNode :: String -> Maybe SourcePos -> STree
+singletonNode s p = SNode (hash s) [SLeaf (pack s) p]
 
 toTree :: JSNode -> STree
 toTree n = case n of
@@ -21,11 +21,11 @@ toTree n = case n of
       where
         toTree' :: Node -> Maybe SourcePos -> STree
         toTree' n p = case n of
-            JSIdentifier s          -> SLeaf (pack s) p
-            JSDecimal s             -> SLeaf (pack s) p
-            JSLiteral s             -> SLeaf (pack s) p
-            JSHexInteger s	        -> SLeaf (pack s) p
-            JSOctal s               -> SLeaf (pack s) p
-            JSStringLiteral _ s     -> SLeaf (pack s) p
-            JSRegEx s               -> SLeaf (pack s) p
-            JSArguments _ s _       -> SNode 0 (map toTree s)
+            JSIdentifier s -> singletonNode s p
+            JSDecimal s -> singletonNode s p
+            JSLiteral s -> singletonNode s p
+            JSHexInteger s -> singletonNode s p
+            JSOctal s -> singletonNode s p
+            JSStringLiteral _ s -> singletonNode s p
+            JSRegEx s -> singletonNode s p
+            JSArguments _ s _ -> SNode 0 (map toTree s)
