@@ -13,7 +13,12 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     Main
+                    ,  Driver.JavaScript
+                    ,  Types
+                    ,  Logic
+                    ,  Server
   build-depends:       base >=4.7 && <4.8
+                    ,  aeson
                     ,  containers
                     ,  text
                     ,  language-javascript
