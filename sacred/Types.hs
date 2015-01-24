@@ -18,11 +18,7 @@ data STree = SLeaf { _leafContent :: Text, _sourcePos :: Maybe SourcePos }
 instance ToJSON STree
 instance FromJSON STree
 
-data Code = Code { _raw :: Text, lang :: String }
-           deriving (Show, Eq, Generic)
-
-instance ToJSON Code
-instance FromJSON Code
+type Code = Text
 
 data Comment = Comment { _id :: ID, _parent :: ID, _attached :: [Hash] }
              deriving (Show, Eq, Generic)

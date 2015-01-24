@@ -10,7 +10,7 @@ import  Data.IntervalMap.FingerTree     (point)
 import  System.IO.Unsafe
 import  Types
 
-sourceToTree :: Text -> STree
+sourceToTree :: Code -> STree
 sourceToTree = toTree . readJs . unpack
 
 toPos :: TokenPosn -> SourcePos
