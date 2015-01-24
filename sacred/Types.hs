@@ -1,15 +1,17 @@
 {-# LANGUAGE OverloadedStrings, DeriveGeneric #-}
 module Types where
 
-import  Data.Aeson (FromJSON, ToJSON)
-import  Data.Text  (Text)
-
-import  GHC.Generics (Generic)
+import  Data.Aeson                      (FromJSON, ToJSON)
+import  Data.IntervalMap.FingerTree     (Interval)
+import  Data.Text                       (Text)
+import  GHC.Generics                    (Generic)
 
 type Hash = Integer
 type ID = String
 
-data STree = SLeaf { _leafContent :: Text }
+type SourcePos = (Int, Int)
+
+data STree = SLeaf { _leafContent :: Text, _sourcePos :: (Maybe SourcePos) }
            | SNode { _hash :: Hash, _children :: [STree] }
            deriving (Show, Eq, Generic)
 

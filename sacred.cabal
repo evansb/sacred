@@ -20,6 +20,8 @@ library
   build-depends:       base >=4.7 && <4.8
                     ,  aeson
                     ,  containers
+                    ,  fingertree
+                    ,  hashable
                     ,  text
                     ,  language-javascript
                     ,  scotty
