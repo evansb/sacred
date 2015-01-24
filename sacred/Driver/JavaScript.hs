@@ -16,13 +16,13 @@ sourceToTree = toTree . readJs . unpack
 toPos :: TokenPosn -> SourcePos
 toPos (TokenPn _ ln col) = (ln, col)
 
-singletonNode :: String -> Maybe SourcePos -> STree
+singletonNode :: String -> SourcePos -> STree
 singletonNode s p = SNode (hash s) [SLeaf (pack s) p]
 
-emptyLeaf :: Maybe SourcePos -> STree
+emptyLeaf :: SourcePos -> STree
 emptyLeaf p = SNode (hashUnique (unsafePerformIO newUnique)) [SLeaf "" p]
 
-listNode :: [JSNode] -> Maybe SourcePos -> STree
+listNode :: [JSNode] -> SourcePos -> STree
 listNode [] p = emptyLeaf p
 listNode s  _ =
         let children = map toTree s in
@@ -43,10 +43,9 @@ toMultiTree = fromChildren . map toTree
 
 toTree :: JSNode -> STree
 toTree n = case n of
-      NN s -> toTree' s Nothing
-      NT s p _ -> toTree' s (Just (toPos p))
+      NN s -> toTree' s (0, 0)
+      NT s p _ -> toTree' s (toPos p)
       where
-        toTree' :: Node -> Maybe SourcePos -> STree
         toTree' n p = case n of
             JSIdentifier s -> singletonNode s p
             JSDecimal s -> singletonNode s p
