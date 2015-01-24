@@ -6,7 +6,6 @@ import  Language.JavaScript.Parser      hiding (parse)
 import  Data.Hashable                   (hash, hashWithSalt)
 import  Data.Unique                     (newUnique, hashUnique)
 import  Data.Text                       (Text, pack, unpack)
-import  Data.IntervalMap.FingerTree     (point)
 import  System.IO.Unsafe
 import  Types
 
@@ -71,74 +70,91 @@ toTree n = case n of
             JSOctal s -> singletonNode s p
             JSStringLiteral _ s -> singletonNode s p
             JSRegEx s -> singletonNode s p
-            JSArguments _ s _ -> withChildren (map toTree s)
-            JSArrayLiteral _ s _ -> withChildren (map toTree s)
-            JSBlock _ s _ -> withChildren (map toTree s)
-            JSBreak _ s _ -> withChildren (map toTree s)
-            JSCallExpression _ _ s _ -> withChildren (map toTree s)
-            JSCase _ e _ s -> withChildren [toTree e, toMultiTree s]
+            JSArguments l s r ->
+                withChildren [toTree l, toMultiTree s, toTree r]
+            JSArrayLiteral l s r ->
+                withChildren [toTree l, toMultiTree s, toTree r]
+            JSBlock l s r ->
+                withChildren [toMultiTree l, toMultiTree s, toMultiTree r]
+            JSBreak l s r ->
+                withChildren [toTree l, toMultiTree s, toTree r]
+            JSCallExpression _ l s r ->
+                withChildren [toMultiTree l, toMultiTree s, toMultiTree r]
+            JSCase c e l s ->
+                withChildren [toTree c, toTree e, toTree l, toMultiTree s]
             -- JSCatch (later, confused)
-            JSContinue _ s _ -> withChildren (map toTree s)
-            JSDefault _ _ s -> withChildren (map toTree s)
-            JSDoWhile _ e _ _ f _ _ -> withChildren [toTree e, toTree f]
+            JSContinue c l s ->
+                withChildren [toTree c, toMultiTree l, toTree s]
+            JSDefault d l s ->
+                withChildren (map toTree s)
+            JSDoWhile p e q r f s t -> 
+                withChildren (map toTree [p,e,q,r,f,s,t])
             JSElision _ -> SEmpty
             JSExpression s -> withChildren (map toTree s)
             JSExpressionBinary _ s o t ->
-                withChildren [toMultiTree s,
-                              toTree o, toMultiTree t]
-            JSExpressionParen _ e _ -> toTree e
+                withChildren [toMultiTree s, toTree o, toMultiTree t]
+            JSExpressionParen l e r -> withChildren (map toTree [l,e,r])
             JSExpressionPostfix _ s o ->
                 withChildren [toMultiTree s, toTree o]
-            JSExpressionTernary c _ t _ f ->
-                withChildren [toMultiTree c, toMultiTree t, toMultiTree f]
-            JSFinally _ b -> toTree b
-            JSFor _ _ e _ f _ g _ h ->
-                withChildren [toMultiTree e, toMultiTree f, toMultiTree g,
-                              toTree h]
-            JSForIn _ _ e _ f _ g ->
-                withChildren [toMultiTree e, toTree f,
-                              toTree g]
-            JSForVar _ _ _ e _ f _ g _ h ->
-                withChildren [toMultiTree e, toMultiTree f, toMultiTree g,
-                              toTree h]
-            JSForVarIn _ _ _ e _ f _ g ->
-                withChildren $ map toTree [e, f, g]
-            JSFunction _ e _ f _ g ->
-                withChildren [toTree e, toMultiTree f, toTree g]
-            JSFunctionExpression _ e _ f _ g ->
-                withChildren [toMultiTree e, toMultiTree f, toTree g]
-            JSIf _ _ e _ f g ->
+            JSExpressionTernary c l t r f ->
+                withChildren [toMultiTree c, toTree l, toMultiTree t, toTree r, toMultiTree f]
+            JSFinally f b ->
+                withChildren [toTree f, toTree b]
+            JSFor a b e c f d g z h ->
+                withChildren [toTree a, toTree b, toMultiTree e, 
+                              toTree c, toMultiTree f, toTree d, toMultiTree g,
+                              toTree z, toTree h
+                              ]
+            JSForIn a b e c f d g ->
+                withChildren [toTree a, toTree b, toTree c, toMultiTree e, toTree f,
+                              toTree d, toTree g]
+            JSForVar a b v e l f r g q h ->
+                withChildren [
+                  toTree a, toTree b, toTree v,
+                  toMultiTree e, toTree l, toMultiTree f, toTree r,
+                  toMultiTree g, toTree q, toTree h]
+            JSForVarIn a b v e l f r g ->
+                withChildren $ map toTree [a, b, v, e, l, f, r, g]
+            JSFunction s e l f r g ->
+                withChildren [toTree s, toTree e, toTree l, toMultiTree f, 
+                              toTree r, toTree g]
+            JSFunctionExpression s e l f r g ->
+                withChildren [toTree s, toMultiTree e, toTree l, toMultiTree f, 
+                              toTree r, toTree g]
+            JSIf i l e r f g ->
                 withChildren [toTree e, toMultiTree f, toMultiTree g]
-            JSLabelled e _ f ->
-                withChildren [toTree e, toTree f]
-            JSMemberDot e _ f ->
-                withChildren [toMultiTree e, toTree f]
-            JSMemberSquare e _ f _ ->
-                withChildren [toMultiTree e, toTree f]
-            JSObjectLiteral _ e _ ->
-                withChildren (map toTree e)
+            JSLabelled e l f ->
+                withChildren [toTree e, toTree l, toTree f]
+            JSMemberDot e d f ->
+                withChildren [toMultiTree e, toTree d, toTree f]
+            JSMemberSquare e l f r ->
+                withChildren [toMultiTree e, toTree l, toTree f, toTree r]
+            JSObjectLiteral l e r ->
+                withChildren [toTree l, toMultiTree e, toTree r]
             JSOperator e -> toTree e
-            JSPropertyAccessor e f _ g _ h ->
-                withChildren [toTree e, toTree f, toMultiTree g, toTree h]
+            JSPropertyAccessor e f l g r h ->
+                withChildren [toTree e, toTree f, toTree l, toMultiTree g,
+                              toTree r, toTree h]
             JSPropertyNameandValue e _ f ->
                 withChildren [toTree e, toMultiTree f]
-            JSReturn _ f _ ->
-                withChildren (map toTree f)
+            JSReturn r f s ->
+                withChildren [toTree r, toMultiTree f, toTree s]
             JSSourceElementsTop e ->
                 toMultiTree e
-            JSSwitch _ _ e _ f ->
-                withChildren [toTree e, toTree f]
-            JSThrow _ e -> withChildren [toTree e]
-            JSTry _ e f ->
-                withChildren [toTree e, toMultiTree f]
+            JSSwitch s l e r f ->
+                withChildren (map toTree [s,l,r,e,f])
+            JSThrow t e -> withChildren [toTree t, toTree e]
+            JSTry t e f ->
+                withChildren [toTree t, toTree e, toMultiTree f]
             JSUnary _ e ->
                 toTree e
             JSVarDecl e f ->
                 withChildren [toTree e, toMultiTree f]
-            JSVariables _ e _ ->
-                toMultiTree e
-            JSWhile _ _ e _ f ->
+            JSVariables v e s ->
+                withChildren [toTree v, toMultiTree e, toTree s]
+            JSWhile w l e r f ->
                 withChildren [toTree e, toTree f]
-            JSWith _ _ e _ f ->
-                withChildren [toTree e, toMultiTree f]
+            JSWith w l e r f ->
+                withChildren [toTree w, toTree l, toTree e,
+                              toTree r, toMultiTree f]
 

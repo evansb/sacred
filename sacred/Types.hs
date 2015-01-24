@@ -2,7 +2,6 @@
 module Types where
 
 import  Data.Aeson                      (FromJSON, ToJSON)
-import  Data.IntervalMap.FingerTree     (Interval)
 import  Data.Text                       (Text)
 import  GHC.Generics                    (Generic)
 
