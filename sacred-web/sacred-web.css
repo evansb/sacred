@@ -1,1 +1,30 @@
 /* CSS declarations go here */
+body {
+    background-color: #fcfcfc;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+#file_form {
+    padding: 1em;
+}
+
+.righted {
+    text-align: right;
+}
+
+.top_bar {
+    padding-left: 1em;
+}
+
+.big-input {
+    font-size: 1.3em;
+    border-width: 1px;
+    border-color: cornflowerblue;
+}
+
+.with-shadow {
+    -webkit-box-shadow : 1px 2px 1px cornflowerblue;
+    -moz-box-shadow:  1px 2px 1px cornflowerblue;
+    box-shadow: 1px 2px 1px cornflowerblue;
+}

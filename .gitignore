@@ -2,3 +2,4 @@ dist/*
 cabal.sandbox.config
 sacred-web/.meteor/*
 .cabal-sandbox
+.idea
