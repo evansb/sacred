@@ -9,7 +9,7 @@ type Hash = Int
 type ID = String
 
 type SourcePos = (Int, Int)
-type SourceRange = SourceRange
+type SourceRange = (SourcePos, SourcePos)
 type Code = Text
 
 data STree = SEmpty

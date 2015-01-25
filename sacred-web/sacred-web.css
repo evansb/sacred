@@ -23,6 +23,26 @@ body {
     border-color: cornflowerblue;
 }
 
+.codelist {
+    list-style: none;
+}
+
+.codeitem {
+    background: #ffffff;
+    padding: 1em;
+    border: 1px solid;
+    border-color: cornflowerblue;
+    margin-bottom: 1em;
+}
+
+.codeitem button {
+    text-align: right;
+}
+
+.codeitem a {
+    color: darkslategrey;
+    text-decoration: none;
+}
 .with-shadow {
     -webkit-box-shadow : 1px 2px 1px cornflowerblue;
     -moz-box-shadow:  1px 2px 1px cornflowerblue;

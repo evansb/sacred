@@ -20,32 +20,58 @@
     </div>
 </template>
 
-<template name="FileControl">
-    <form id="file_form">
-        <input id="filename" class="big-input" type="text"/> {{ ext }}
-        <select>
-            {{#each languages }}
-                <option value="{{ lang }}">{{lang}}</option>
-            {{/each}}
-        </select>
-        <a class="pure-button pure-button-primary" href="#">Submit</a>
-    </form>
+<template name="Navbar2">
+    <div class="pure-g">
+        <div class="pure-u-5-5">
+            <div class="pure-menu pure-menu-open pure-menu-horizontal top_bar">
+                <ul>
+                    <li><a href="../new">new</a></li>
+                    <li><a href="../submission">submission</a></li>
+                    <li><a href="https://www.github.com/evansb/sacred">source code</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template name="CodeItem">
+    <div class="pure-g">
+        <div class="pure-u-5-5"><a href="review/{{_id}}">{{ filename }}</a><br><small>Reviewed by</small> </div>
+    </div>
 </template>
 
 <template name="NewCode">
    {{> Navbar }}
     <div class="pure-g container">
-        <div class="pure-u-2-5">{{> FileControl }} </div>
+        <div class="pure-u-2-5">
+            <input id="filename" class="big-input" type="text"/>
+            <select>
+                {{#each languages }}
+                    <option value="{{ lang }}">{{lang}}</option>
+                {{/each}}
+            </select>
+            <button id="submit_btn" class="pure-button pure-button-primary">submit</button>
+        </div>
     </div>
-    {{> CodeMirror options=editorOptions }}
+    {{> CodeMirror id="editor" options=editorOptions }}
 </template>
 
 <template name="ViewCode">
     {{> Navbar }}
+    <div class="pure-g container">
+        <div class="pure-u-5-5">
+            <ul class="codelist">
+            {{#each codes }}
+            <li class="codeitem">{{> CodeItem }}</li>
+            {{/each}}
+            </ul>
+        </div>
+    </div>
 </template>
 
 <template name="ReviewCode">
-    {{> Navbar }}
+    {{> Navbar2 }}
+    {{> CodeMirror id="editor" options=editorOptions code=editorCode }}
 </template>
 
 <body></body>
