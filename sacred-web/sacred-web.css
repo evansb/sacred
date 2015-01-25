@@ -39,6 +39,10 @@ body {
     text-align: right;
 }
 
+.annotator {
+    position: fixed;
+    top: 10px;
+}
 .codeitem a {
     color: darkslategrey;
     text-decoration: none;

@@ -54,6 +54,7 @@ fitScore int1@((rb, cb), (re, ce)) (SNode _ int2@((rb', cb'), (re', ce')) _) =
                 | rb < rb' && rb' < re' && re' < re = True
                 | rb == rb' && rb' <= re' && re' == re =
                     cb <= cb' && cb' <= ce' && ce' <= ce
+                | otherwise = False
 
 bestFit :: SourceRange -> STree -> Maybe Hash
 bestFit pos tree = case fitScores pos tree of
@@ -74,8 +75,17 @@ diffJS old new = case (oldTree, newTree) of
         where oldTree = toGenTree (parseSource old :: JS.Type)
               newTree = toGenTree (parseSource new :: JS.Type)
 
-commentJS :: CommentReq -> Code -> CommentRes
-commentJS creq cde = CommentRes (fromMaybe 0 (bestFit range tree)) (_content creq)
+commentJS :: Code -> CommentReq -> CommentRes
+commentJS cde creq = CommentRes (fromMaybe 0 (bestFit range tree)) (_content creq)
         where
             range = _range creq
             tree = toGenTree (parseSource cde :: JS.Type)
+
+respondAnalysis :: AnalysisReq -> [DiffType]
+respondAnalysis req = diffJS (_aroldcode req) (_arnewcode req)
+
+respondReview :: ReviewReq -> ReviewRes
+respondReview req = map (commentJS code) creqs
+        where
+              code = _rrcode req
+              creqs = _rrcomments req

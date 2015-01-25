@@ -58,11 +58,39 @@ Template.NewCode.events({
 Template.ViewCode.helpers({
     codes: function() {
         return Code.find({});
+    }
+});
+
+Template.ReviewCode.helpers({
+    selectedSource: function() {
+        return "Foo";
     },
     editorOptions : {
         mode: Session.get("language"),
         lineNumbers: true,
         readOnly: true
     }
+});
+
+Template.ReviewCode.events({
+    "click #annotate_btn" : function(event, template) {
+        var cm = $("#review_editor").next(".CodeMirror")[0].CodeMirror;
+        var annotation = $("#comment_editor").val();
+        var begin = cm.getCursor(true);
+        var end = cm.getCursor(false);
+        var commentReq = {
+            "_range" : [[begin.line, begin.ch], [end.line, end.ch]],
+            "_content" : annotation
+        };
+        var reviewReq = {
+            "_rrcode" : cm.getValue(),
+            "_rrcomments" : [commentReq]
+        }
+
+        $.post("http://localhost:8000/review",
+            JSON.stringify(reviewReq))
+            .done(function(data) { console.log(data); });
+    }
+
 });
 

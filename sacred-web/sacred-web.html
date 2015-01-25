@@ -71,7 +71,16 @@
 
 <template name="ReviewCode">
     {{> Navbar2 }}
-    {{> CodeMirror id="editor" options=editorOptions code=editorCode }}
+    <div class="pure-g container">
+        <div class="pure-u-4-5">
+            {{> CodeMirror id="review_editor" options=editorOptions code=editorCode }}
+        </div>
+        <div class="pure-u-1-5 annotator">
+            <textarea id="comment_editor" rows="10"></textarea><br>
+            <small>Selected : {{ selectedSource }} </small> <br>
+            <button id="annotate_btn" class="pure-button">annotate</button>
+        </div>
+    </div>
 </template>
 
 <body></body>

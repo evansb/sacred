@@ -44,10 +44,11 @@ data ReviewReq = ReviewReq {
 instance ToJSON ReviewReq
 instance FromJSON ReviewReq
 
+type ReviewRes = [CommentRes]
+
 data AnalysisReq = AnalysisReq {
     _aroldcode :: Code,
-    _arnewcode :: Code,
-    _arcomment :: [CommentRes]
+    _arnewcode :: Code
 } deriving (Show, Eq, Generic)
 
 instance ToJSON AnalysisReq
